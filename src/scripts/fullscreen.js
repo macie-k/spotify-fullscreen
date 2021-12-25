@@ -1,48 +1,49 @@
+var infoNode = null;
+var currentSong = {};
 var client_id = 'd882d791766e4a32969c10c265c57337';
 var client_secret = '39274d1fbb84487a9e821797e310b5b1';
 
 var fullscreen = false;
 
-window.addEventListener('load', () => {
-    addButton();
-    addOverlay();
+const waitForBar = new Promise((resolve) => {
+    const waiter = setInterval(() => {
+        log('Waiting...');
+
+        let container = document.querySelector('div[data-testid="now-playing-widget"]');
+        if (container !== null) {
+            log('Widget ready');
+            infoNode = document.querySelector('a[data-testid="context-link"]');
+
+            clearInterval(waiter);
+            resolve(container);
+        }
+    }, 100);
 });
 
-function addOverlay() {
-    fetch(chrome.runtime.getURL('/src/html/fsView.html'))
-        .then((r) => r.text())
-        .then((html) => {
-            const overlay = document.createElement('div');
-            overlay.innerHTML = html;
-            overlay.className = 'fs-overlay-container';
-            overlay.style.top = window.innerHeight + 'px';
+window.addEventListener('load', () => {
+    addOverlay();
 
-            //addOverlayListeners();
+    waitForBar.then((container) => {
+        infoNode = document.querySelector('a[data-testid="context-link"]');
 
-            document.body.appendChild(overlay);
-        });
-}
+        addButton(container);
+        addSongObserver();
+    });
+});
 
-function addButton() {
-    fetch(chrome.runtime.getURL('/src/html/toggleButton.html'))
-        .then((r) => r.text())
-        .then((html) => {
-            const button = document.createElement('div');
-            button.innerHTML = html;
-            button.addEventListener('click', toggleFullscreen);
+function addSongObserver() {
+    const observer = new MutationObserver(async () => {
+        const info = await getCurrentSongInfo();
+        currentSong = {
+            id: infoNode.href.split('track%3A')[1],
+            title: info.title,
+            artists: info.artists,
+            cover: info.cover,
+        };
+        log('SONG CHANGED: ', currentSong);
+    });
 
-            let container = document.querySelector('div[data-testid="now-playing-widget"]');
-            const waitForBar = setInterval(() => {
-                log('Waiting...');
-                if (container === null) {
-                    container = document.querySelector('div[data-testid="now-playing-widget"]');
-                } else {
-                    container.appendChild(button);
-                    clearInterval(waitForBar);
-                    log('Button added');
-                }
-            }, 100);
-        });
+    observer.observe(infoNode, { attributes: true });
 }
 
 async function reFetch(url, retries) {
@@ -68,9 +69,7 @@ async function getCurrentSongInfo() {
         localStorage.setItem('spotify_fs_token', await getToken());
     }
 
-    const infoElement = document.querySelector('a[data-testid="context-link"]');
-    const ID = infoElement.href.split('track%3A')[1];
-
+    const ID = infoNode.href.split('track%3A')[1];
     const songInfo = await reFetch(`https://api.spotify.com/v1/tracks/${ID}`, 1)
         .then((res) => {
             return res.json();
@@ -83,7 +82,7 @@ async function getCurrentSongInfo() {
     return {
         artists: songInfo.artists.map((artist) => artist.name),
         cover: songInfo.album.images[0].url,
-        name: songInfo.name,
+        title: songInfo.name,
     };
 }
 
@@ -112,8 +111,6 @@ function toggleFullscreen() {
 
 // document.querySelector('a[data-testid="context-link"]')
 async function showFullscreen(show) {
-    const info = await getCurrentSongInfo();
-    console.log(info);
     const overlay = document.querySelector('.fs-overlay-container');
 
     if (show) {
@@ -125,6 +122,34 @@ async function showFullscreen(show) {
     }
 }
 
-function log(val) {
-    console.log(`[Spotify FS]: ${val}`);
+function addOverlay() {
+    fetch(chrome.runtime.getURL('/src/html/fsView.html'))
+        .then((r) => r.text())
+        .then((html) => {
+            const overlay = document.createElement('div');
+            overlay.innerHTML = html;
+            overlay.className = 'fs-overlay-container';
+            overlay.style.top = window.innerHeight + 'px';
+
+            //addOverlayListeners();
+
+            document.body.appendChild(overlay);
+        });
+}
+
+function addButton(container) {
+    fetch(chrome.runtime.getURL('/src/html/toggleButton.html'))
+        .then((r) => r.text())
+        .then((html) => {
+            const button = document.createElement('div');
+            button.innerHTML = html;
+            button.addEventListener('click', toggleFullscreen);
+
+            container.appendChild(button);
+            log('Button added');
+        });
+}
+
+function log(val, val2 = '') {
+    console.log('[Spotify FS]: ', val, val2);
 }
