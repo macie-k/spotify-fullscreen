@@ -1,0 +1,19 @@
+{
+    "name": "Spotify Fullscreen",
+    "description": "Adds fullscreen in webplayer",
+    "version": "1.0",
+    "manifest_version": 3,
+    "content_scripts": [
+        {
+            "matches": ["https://open.spotify.com/*"],
+            "css": ["/src/styles/buttonStyle.css", "/src/styles/fsViewStyle.css"],
+            "js": ["/src/scripts/fullscreen.js"]
+        }
+    ],
+    "web_accessible_resources": [
+        {
+            "resources": ["/src/html/*", "/src/scripts/fullscreen.js"],
+            "matches": ["https://open.spotify.com/*"]
+        }
+    ]
+}
