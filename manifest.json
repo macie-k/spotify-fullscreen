@@ -12,7 +12,7 @@
     ],
     "web_accessible_resources": [
         {
-            "resources": ["/src/html/*", "/src/scripts/fullscreen.js"],
+            "resources": ["/src/html/*", "/src/scripts/*"],
             "matches": ["https://open.spotify.com/*"]
         }
     ]

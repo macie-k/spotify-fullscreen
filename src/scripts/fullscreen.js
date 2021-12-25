@@ -5,7 +5,7 @@ var client_secret = '39274d1fbb84487a9e821797e310b5b1';
 
 var fullscreen = false;
 
-const waitForBar = new Promise((resolve) => {
+const waitForSongDetails = new Promise((resolve) => {
     const waiter = setInterval(() => {
         log('Waiting...');
 
@@ -21,52 +21,20 @@ const waitForBar = new Promise((resolve) => {
 });
 
 window.addEventListener('load', () => {
-    addOverlay();
-
-    waitForBar.then((container) => {
+    waitForSongDetails.then((container) => {
         infoNode = document.querySelector('a[data-testid="context-link"]');
 
+        addOverlay();
         addButton(container);
+
         addSongObserver();
+        addListeningOnObserver();
     });
 });
 
-function addSongObserver() {
-    const observer = new MutationObserver(async () => {
-        const info = await getCurrentSongInfo();
-        currentSong = {
-            id: infoNode.href.split('track%3A')[1],
-            title: info.title,
-            artists: info.artists,
-            cover: info.cover,
-        };
-        log('SONG CHANGED: ', currentSong);
-    });
-
-    observer.observe(infoNode, { attributes: true });
-}
-
-async function reFetch(url, retries) {
-    return fetch(url, {
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem('spotify_fs_token')}`,
-        },
-    }).then(async (res) => {
-        if (res.ok) return res;
-        if (retries > 0) {
-            if (res.status === 401) {
-                const newToken = await getToken();
-                localStorage.setItem('spotify_fs_token', newToken);
-            }
-            return reFetch(url, retries - 1);
-        }
-        throw new Error(res.status === 401 ? 'Could not authenticate' : 'Error getting response');
-    });
-}
-
 async function getCurrentSongInfo() {
     if (!localStorage.getItem('spotify_fs_token')) {
-        localStorage.setItem('spotify_fs_token', await getToken());
+        updateLSToken(await getToken());
     }
 
     const ID = infoNode.href.split('track%3A')[1];
@@ -109,19 +77,32 @@ function toggleFullscreen() {
     showFullscreen(fullscreen);
 }
 
-// document.querySelector('a[data-testid="context-link"]')
 async function showFullscreen(show) {
     const overlay = document.querySelector('.fs-overlay-container');
 
     if (show) {
         log('Showing fullscreen');
-        overlay.style.top = '0px';
+        if (!localStorage.getItem('spotify_fs_current')) {
+            updateLSCurrent(JSON.stringify(currentSong));
+        }
+        overlay.style.top = 0;
     } else {
         log('Hiding fullscreen');
-        overlay.style.top = window.innerHeight + 'px';
+        overlay.style.top = -overlay.clientHeight + 'px';
     }
 }
 
+/* set localStorage currentSong information */
+function updateLSCurrent(songInfo) {
+    localStorage.setItem('spotify_fs_current', JSON.stringify(songInfo));
+}
+
+/* set localStorage token information */
+function updateLSToken(token) {
+    localStorage.setItem('spotify_fs_token', token);
+}
+
+/* inject overlay HTML */
 function addOverlay() {
     fetch(chrome.runtime.getURL('/src/html/fsView.html'))
         .then((r) => r.text())
@@ -129,14 +110,14 @@ function addOverlay() {
             const overlay = document.createElement('div');
             overlay.innerHTML = html;
             overlay.className = 'fs-overlay-container';
-            overlay.style.top = window.innerHeight + 'px';
+            overlay.style.top = '-' + overlay.style.height;
 
-            //addOverlayListeners();
-
-            document.body.appendChild(overlay);
+            document.body.insertBefore(overlay, document.body.firstChild);
+            resizeOverlay();
         });
 }
 
+/* inject toggle-button HTML */
 function addButton(container) {
     fetch(chrome.runtime.getURL('/src/html/toggleButton.html'))
         .then((r) => r.text())
@@ -148,6 +129,56 @@ function addButton(container) {
             container.appendChild(button);
             log('Button added');
         });
+}
+
+/* set overlay size */
+function resizeOverlay() {
+    document.querySelector('.fs-overlay-container').style.height = `calc(100vh - ${
+        document.querySelector('.Root__now-playing-bar').clientHeight
+    }px)`;
+}
+
+/* detect "Listening on ..." div changes */
+function addListeningOnObserver() {
+    const targetNode = document.querySelector('.Root__now-playing-bar > footer');
+    const observer = new MutationObserver(resizeOverlay);
+
+    observer.observe(targetNode, { childList: true });
+}
+
+/* detect song changes */
+function addSongObserver() {
+    const observer = new MutationObserver(async () => {
+        const info = await getCurrentSongInfo();
+        currentSong = {
+            id: infoNode.href.split('track%3A')[1],
+            title: info.title,
+            artists: info.artists,
+            cover: info.cover,
+        };
+        log('SONG CHANGED: ', currentSong);
+    });
+
+    observer.observe(infoNode, { attributes: true });
+}
+
+/* retry token generation when outdated or not present */
+async function reFetch(url, retries) {
+    return fetch(url, {
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem('spotify_fs_token')}`,
+        },
+    }).then(async (res) => {
+        if (res.ok) return res;
+        if (retries > 0) {
+            if (res.status === 401) {
+                const newToken = await getToken();
+                localStorage.setItem('spotify_fs_token', newToken);
+            }
+            return reFetch(url, retries - 1);
+        }
+        throw new Error(res.status === 401 ? 'Could not authenticate' : 'Error getting response');
+    });
 }
 
 function log(val, val2 = '') {
