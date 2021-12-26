@@ -55,7 +55,7 @@
         37.2px 28.4px 66px -23px rgba(0, 0, 0, 0.05), 89px 68px 158px -23px rgba(0, 0, 0, 0.07);
 }
 
-.fs-cover-rounded {
+.fs-cover.rounded {
     border-radius: 5%;
 }
 

@@ -9,7 +9,7 @@
             <section>
                 <p>Cover art style</p>
                 <div id="cover-options">
-                    <input type="radio" name="cover-style" value="square" checked/>
+                    <input type="radio" name="cover-style" value="square" checked />
                     <label>Square</label>
 
                     <input type="radio" name="cover-style" value="round" />
@@ -18,11 +18,12 @@
                     <input type="radio" name="cover-style" value="rounded" />
                     <label>Rounded</label>
                 </div>
-                <input type="checkbox" value="cover-spin" disabled/>
-                <label>Spin</label></br>
+                <input type="checkbox" value="cover-spin" disabled />
+                <label>Spin</label>
             </section>
             <section>
                 <p>Show icons</p>
+                <!-- prettier-ignore -->
                 <div id="icon-options">
                     <input type="checkbox" value="Heart" checked/>
                     <svg role="img" height="16" width="16" viewBox="0 0 16 16"><path d="M13.764 2.727a4.057 4.057 0 00-5.488-.253.558.558 0 01-.31.112.531.531 0 01-.311-.112 4.054 4.054 0 00-5.487.253A4.05 4.05 0 00.974 5.61c0 1.089.424 2.113 1.168 2.855l4.462 5.223a1.791 1.791 0 002.726 0l4.435-5.195A4.052 4.052 0 0014.96 5.61a4.057 4.057 0 00-1.196-2.883zm-.722 5.098L8.58 13.048c-.307.36-.921.36-1.228 0L2.864 7.797a3.072 3.072 0 01-.905-2.187c0-.826.321-1.603.905-2.187a3.091 3.091 0 012.191-.913 3.05 3.05 0 011.957.709c.041.036.408.351.954.351.531 0 .906-.31.94-.34a3.075 3.075 0 014.161.192 3.1 3.1 0 01-.025 4.403z"></path></svg>
@@ -49,11 +50,26 @@
             <section>
                 <p>Other</p>
                 <div id="other-options">
-                    <input type="checkbox" value="hide-bottom-art" checked/>
-                    <label>Hide bottom art</label></br>
+                    <input type="checkbox" value="hide-bottom-art" checked />
+                    <label>Hide bottom art</label><br />
+                </div>
+            </section>
+            <hr />
+            <section>
+                <p>Contribute</p>
+                <!-- prettier-ignore -->
+                <div class="contribute-container">
+                    <svg id="rate" width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M15.3004 12.8297C15.1001 12.9764 15.0143 13.2403 15.1001 13.4749L17.3888 20.7183L11.4095 16.2608C11.2093 16.1142 10.9518 16.1142 10.7515 16.2608L4.7436 20.7183L7.03234 13.4749C7.11816 13.2403 7.03234 12.9764 6.83207 12.8297L0.82415 8.37225H8.20531C8.46279 8.37225 8.66306 8.1963 8.74888 7.96169L11.0662 0.718292L13.355 7.96169C13.4408 8.1963 13.641 8.37225 13.8985 8.37225H21.3083L15.3004 12.8297Z" stroke="#222222" stroke-linejoin="round"/> </svg>
+                    <span>Rate</span>
+
+                    <svg id="donate" width="22" height="20" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg"> <path fill-rule="evenodd" clip-rule="evenodd" d="M10.2207 18.6374C7.83349 17.1929 5.44628 15.2199 3.80314 13.3207C2.33981 11.6365 1.40353 9.88478 1.0129 8.09001C0.876487 7.47536 0.833083 6.25836 0.919891 5.69288C1.27332 3.52318 2.90406 1.74685 5.07425 1.16293C5.71291 0.990834 7.03362 0.978541 7.62267 1.13835C8.12491 1.27357 8.93098 1.64236 9.40222 1.95583C9.84866 2.24471 10.4563 2.80404 10.7601 3.20356C10.9896 3.50474 10.9896 3.50474 11.1384 3.30805C11.4422 2.89009 12.1429 2.25701 12.6699 1.90666C14.4991 0.708096 16.6941 0.695803 18.5418 1.88207C20.3834 3.0622 21.3569 5.16429 21.0778 7.35858C20.7244 10.186 19.0131 12.9027 15.8694 15.6379C14.2076 17.0823 11.4112 19 10.9772 19C10.8842 19 10.5493 18.834 10.2207 18.6374Z" stroke="#222222" stroke-width="1.125"/> </svg>
+                    <span>Donate</span>
+
+                    <svg id="issues" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M2.0873 14.413L2.10403 14.228L1.99584 14.0769C1.0143 12.7063 0.5 11.1272 0.5 9.5C0.5 4.86173 4.71128 1 10 1C15.2887 1 19.5 4.86173 19.5 9.5C19.5 14.1383 15.2887 18 10 18C8.6419 18 7.33353 17.7488 6.10604 17.2536L5.88011 17.1625L5.66911 17.2843C4.56801 17.9196 3.52691 18.3483 2.7454 18.62C2.35501 18.7558 2.03079 18.8519 1.79806 18.9148C1.61179 18.9651 1.49529 18.9912 1.45083 19.0006L1.44355 19.0007L1.31275 19.001C1.20436 19.0011 1.06087 19.001 0.917048 19.0009C0.84376 19.0008 0.770249 19.0007 0.7013 19.0006C1.04315 18.5627 1.31749 17.9922 1.53239 17.3346C1.79956 16.517 1.98641 15.529 2.0873 14.413Z" stroke="#222222"/> <path id="mark" d="M9.9 13.5V13.3H10.1V13.5H9.9ZM9.984 11.004V6.1H10.004V11.004H9.984Z" stroke="#222222"/> </svg>
+                    <span>Report issue</span>
                 </div>
             </section>
         </div>
+        <script src="../scripts/options.js"></script>
     </body>
-    <script src="../scripts/options.js"></script>
 </html>

@@ -1,4 +1,9 @@
+* {
+    color: #222;
+}
+
 p {
+    margin: 0;
     font-size: 17px;
     font-weight: 600;
 }
@@ -12,8 +17,17 @@ input {
     margin-left: 0;
 }
 
-section:not(:first-of-type) {
-    padding-top: 15px;
+section > p:first-of-type {
+    padding-bottom: 10px;
+}
+
+section:not(:first-of-type) > p:first-of-type {
+    padding-top: 25px;
+}
+
+hr {
+    margin-top: 30px;
+    margin-bottom: 10px;
 }
 
 .options-container {
@@ -38,4 +52,34 @@ section:not(:first-of-type) {
 #icon-options > svg {
     margin-left: 2px;
     margin-right: 20px;
+}
+
+.contribute-container {
+    display: flex;
+    align-items: center;
+    padding-top: 5px;
+}
+
+.contribute-container > svg {
+    cursor: pointer;
+    height: 20px;
+    width: auto;
+}
+
+.contribute-container > svg:hover {
+    fill: #222;
+}
+
+#donate {
+    height: 18px;
+}
+
+#issues:hover #mark {
+    stroke: #fff;
+}
+
+.contribute-container > span {
+    font-size: 13px;
+    padding: 0 5px;
+    padding-right: 20px;
 }
