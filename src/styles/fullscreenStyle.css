@@ -54,3 +54,21 @@
         19.9px 15.2px 35.3px -23px rgba(0, 0, 0, 0.042),
         37.2px 28.4px 66px -23px rgba(0, 0, 0, 0.05), 89px 68px 158px -23px rgba(0, 0, 0, 0.07);
 }
+
+.fs-cover-rounded {
+    border-radius: 5%;
+}
+
+.fs-cover.round {
+    border-radius: 50%;
+}
+
+.fs-cover.spin {
+    animation: spin 15s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

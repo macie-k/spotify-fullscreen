@@ -1,8 +1,8 @@
-var infoNode = null;
-var currentSong = {};
 var client_id = 'd882d791766e4a32969c10c265c57337';
 var client_secret = '39274d1fbb84487a9e821797e310b5b1';
 
+var infoNode = null;
+var currentSong = {};
 var fullscreen = false;
 
 const waitForSongDetails = new Promise((resolve) => {
@@ -117,6 +117,26 @@ function setFullscreenDetails() {
     cover.src = currentSong.cover;
 }
 
+function hideBottomIcons() {
+    const heart = document.querySelector('button[aria-label="Save to Your Library"]');
+    const remove = document.querySelector('button[aria-label="Remove"]');
+    const pip = document.querySelector('button[data-testid="pip-toggle-button"]');
+    const lyrics = document.querySelector('button[aria-label="Lyrics"]');
+    const queue = document.querySelector('button[aria-label="Queue"]').parentElement;
+    const devices = document.querySelector('svg[aria-label="Connect to a device"]').parentElement;
+    const mute = document.querySelector('button[aria-label="Mute"]');
+
+    const ICONS = {
+        heart: heart,
+        remove: remove,
+        pip: pip,
+        lyrics: lyrics,
+        queue: queue,
+        devices: devices,
+        mute: mute,
+    };
+}
+
 /* set localStorage token information */
 function updateLSToken(token) {
     localStorage.setItem('spotify_fs_token', token);
@@ -124,7 +144,7 @@ function updateLSToken(token) {
 
 /* inject overlay HTML */
 function addOverlay() {
-    fetch(chrome.runtime.getURL('/src/html/fsView.html'))
+    fetch(chrome.runtime.getURL('/src/html/fullscreen.html'))
         .then((r) => r.text())
         .then((html) => {
             const overlay = document.createElement('div');
@@ -139,7 +159,7 @@ function addOverlay() {
 
 /* inject toggle-button HTML */
 function addButton(container) {
-    fetch(chrome.runtime.getURL('/src/html/toggleButton.html'))
+    fetch(chrome.runtime.getURL('/src/html/button.html'))
         .then((r) => r.text())
         .then((html) => {
             const button = document.createElement('div');

@@ -1,0 +1,41 @@
+p {
+    font-size: 17px;
+    font-weight: 600;
+}
+
+label {
+    font-size: 15px;
+    padding-right: 15px;
+}
+
+input {
+    margin-left: 0;
+}
+
+section:not(:first-of-type) {
+    padding-top: 15px;
+}
+
+.options-container {
+    padding: 20px;
+    padding-top: 0;
+}
+
+#other-options > input[type='checkbox'],
+#cover-options > input[type='checkbox'] {
+    margin-top: 10px;
+}
+
+#other-options > input[type='checkbox']:first-of-type {
+    margin-top: 0;
+}
+
+#icon-options {
+    display: flex;
+    align-items: center;
+}
+
+#icon-options > svg {
+    margin-left: 2px;
+    margin-right: 20px;
+}
