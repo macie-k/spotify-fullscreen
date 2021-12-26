@@ -156,8 +156,11 @@ function hideBottomIcons(hide) {
             el.style.display = hide ? 'none' : 'block';
 
             if (icon === 'devices') {
-                document.querySelector('.encore-bright-accent-set').parentElement.style.display =
-                    hide ? 'none' : 'block';
+                if (document.querySelector('.encore-bright-accent-set')) {
+                    document.querySelector(
+                        '.encore-bright-accent-set'
+                    ).parentElement.style.display = hide ? 'none' : 'block';
+                }
             }
         }
     }
