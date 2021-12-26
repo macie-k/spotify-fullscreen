@@ -11,7 +11,11 @@
     border-bottom-width: 2px;
 }
 
-.fs-toggle-container:hover .fs-toggle {
+.fs-toggle.active {
+    border-color: #1ed760;
+}
+
+.fs-toggle-container:hover .fs-toggle:not(.active) {
     border: 1px solid #fff;
     border-bottom-width: 2px;
 }

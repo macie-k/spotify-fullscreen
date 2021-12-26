@@ -21,8 +21,8 @@ const waitForSongDetails = new Promise((resolve) => {
 });
 
 window.addEventListener('load', () => {
-    waitForSongDetails.then((container) => {
-        infoNode = document.querySelector('a[data-testid="context-link"]');
+    waitForSongDetails.then(async (container) => {
+        updateCurrentSong(await getCurrentSongInfo());
 
         addOverlay();
         addButton(container);
@@ -82,19 +82,39 @@ async function showFullscreen(show) {
 
     if (show) {
         log('Showing fullscreen');
-        if (!localStorage.getItem('spotify_fs_current')) {
-            updateLSCurrent(JSON.stringify(currentSong));
-        }
+
+        setFullscreenDetails();
         overlay.style.top = 0;
+
+        setTimeout(() => {
+            document.querySelector('.fs-toggle').classList.add('active');
+            document.querySelector('button[aria-label="Expand"]').click();
+        }, 200);
     } else {
         log('Hiding fullscreen');
+
+        document.querySelector('.fs-toggle').classList.remove('active');
+        document.querySelector('button[aria-label="Collapse"]').click();
+
         overlay.style.top = -overlay.clientHeight + 'px';
     }
 }
 
-/* set localStorage currentSong information */
-function updateLSCurrent(songInfo) {
-    localStorage.setItem('spotify_fs_current', JSON.stringify(songInfo));
+function updateCurrentSong(info) {
+    currentSong = {
+        id: infoNode.href.split('track%3A')[1],
+        title: info.title,
+        artists: info.artists,
+        cover: info.cover,
+    };
+}
+
+function setFullscreenDetails() {
+    const backgrounds = document.querySelectorAll('.fs-bg');
+    backgrounds.forEach((bg) => (bg.style.backgroundImage = `url('${currentSong.cover}')`));
+
+    const cover = document.querySelector('.fs-cover');
+    cover.src = currentSong.cover;
 }
 
 /* set localStorage token information */
@@ -149,14 +169,9 @@ function addListeningOnObserver() {
 /* detect song changes */
 function addSongObserver() {
     const observer = new MutationObserver(async () => {
-        const info = await getCurrentSongInfo();
-        currentSong = {
-            id: infoNode.href.split('track%3A')[1],
-            title: info.title,
-            artists: info.artists,
-            cover: info.cover,
-        };
         log('SONG CHANGED: ', currentSong);
+        updateCurrentSong(await getCurrentSongInfo());
+        setFullscreenDetails();
     });
 
     observer.observe(infoNode, { attributes: true });
