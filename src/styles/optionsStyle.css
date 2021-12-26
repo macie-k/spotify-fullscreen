@@ -27,7 +27,7 @@ section:not(:first-of-type) > p:first-of-type {
 
 hr {
     margin-top: 30px;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
 
 .options-container {
@@ -64,10 +64,14 @@ hr {
     cursor: pointer;
     height: 20px;
     width: auto;
+    fill: transparent;
+
+    transition: fill 0.2s ease-in-out;
 }
 
 .contribute-container svg:hover {
     fill: #222;
+    transition: fill 0.1s ease-in-out;
 }
 
 .donate {

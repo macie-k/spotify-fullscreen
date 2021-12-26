@@ -1,0 +1,9 @@
+{
+    "cover": {
+        "type": "square",
+        "spin": false
+    },
+    "show_icons": ["heart", "mute"],
+    "hide_bottom_art": true,
+    "enable_logging": false
+}

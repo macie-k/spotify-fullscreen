@@ -1,3 +1,4 @@
+var options = {};
 var client_id = 'd882d791766e4a32969c10c265c57337';
 var client_secret = '39274d1fbb84487a9e821797e310b5b1';
 
@@ -20,7 +21,9 @@ const waitForSongDetails = new Promise((resolve) => {
     }, 100);
 });
 
-window.addEventListener('load', () => {
+window.addEventListener('load', async () => {
+    await loadOptions();
+
     waitForSongDetails.then(async (container) => {
         updateCurrentSong(await getCurrentSongInfo());
 
@@ -31,6 +34,16 @@ window.addEventListener('load', () => {
         addListeningOnObserver();
     });
 });
+
+async function loadOptions() {
+    const defaultOptions = await fetch(
+        chrome.runtime.getURL('/resources/config/options.json')
+    ).then((res) => res.json());
+
+    chrome.storage.sync.get(defaultOptions, (savedOptions) => {
+        options = savedOptions;
+    });
+}
 
 async function getCurrentSongInfo() {
     if (!localStorage.getItem('spotify_fs_token')) {
@@ -79,17 +92,22 @@ function toggleFullscreen() {
 
 async function showFullscreen(show) {
     const overlay = document.querySelector('.fs-overlay-container');
+    hideBottomIcons(show);
+    resizeOverlay();
 
     if (show) {
         log('Showing fullscreen');
 
+        document.querySelector('.fs-toggle').classList.add('active');
+
         setFullscreenDetails();
         overlay.style.top = 0;
 
-        setTimeout(() => {
-            document.querySelector('.fs-toggle').classList.add('active');
-            document.querySelector('button[aria-label="Expand"]').click();
-        }, 200);
+        if (options.hide_bottom_art) {
+            setTimeout(() => {
+                document.querySelector('button[aria-label="Expand"]').click();
+            }, 200);
+        }
     } else {
         log('Hiding fullscreen');
 
@@ -115,10 +133,14 @@ function setFullscreenDetails() {
 
     const cover = document.querySelector('.fs-cover');
     cover.src = currentSong.cover;
+    cover.classList.add(options.cover.type);
+    if (options.cover.spin) {
+        cover.classList.add('spin');
+    }
 }
 
-function hideBottomIcons() {
-    const ICONS = {
+function hideBottomIcons(hide) {
+    const icons = {
         heart: document.querySelector('button[aria-label="Save to Your Library"]'),
         remove: document.querySelector('button[aria-label="Remove"]'),
         pip: document.querySelector('button[data-testid="pip-toggle-button"]'),
@@ -127,6 +149,18 @@ function hideBottomIcons() {
         devices: document.querySelector('svg[aria-label="Connect to a device"]').parentElement,
         mute: document.querySelector('button[aria-label="Mute"]'),
     };
+
+    for (let icon in icons) {
+        const el = icons[icon];
+        if (el && !options.show_icons.includes(icon)) {
+            el.style.display = hide ? 'none' : 'block';
+
+            if (icon === 'devices') {
+                document.querySelector('.encore-bright-accent-set').parentElement.style.display =
+                    hide ? 'none' : 'block';
+            }
+        }
+    }
 }
 
 /* set localStorage token information */
@@ -181,7 +215,7 @@ function addListeningOnObserver() {
 /* detect song changes */
 function addSongObserver() {
     const observer = new MutationObserver(async () => {
-        log('SONG CHANGED: ', currentSong);
+        log(`Song changed: ${currentSong.title}`);
         updateCurrentSong(await getCurrentSongInfo());
         setFullscreenDetails();
     });
@@ -208,6 +242,8 @@ async function reFetch(url, retries) {
     });
 }
 
-function log(val, val2 = '') {
-    console.log('[Spotify FS]: ', val, val2);
+function log(val) {
+    if (options.enable_logging) {
+        console.log('[Spotify FS]: ', val);
+    }
 }
