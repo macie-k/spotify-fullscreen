@@ -118,22 +118,14 @@ function setFullscreenDetails() {
 }
 
 function hideBottomIcons() {
-    const heart = document.querySelector('button[aria-label="Save to Your Library"]');
-    const remove = document.querySelector('button[aria-label="Remove"]');
-    const pip = document.querySelector('button[data-testid="pip-toggle-button"]');
-    const lyrics = document.querySelector('button[aria-label="Lyrics"]');
-    const queue = document.querySelector('button[aria-label="Queue"]').parentElement;
-    const devices = document.querySelector('svg[aria-label="Connect to a device"]').parentElement;
-    const mute = document.querySelector('button[aria-label="Mute"]');
-
     const ICONS = {
-        heart: heart,
-        remove: remove,
-        pip: pip,
-        lyrics: lyrics,
-        queue: queue,
-        devices: devices,
-        mute: mute,
+        heart: document.querySelector('button[aria-label="Save to Your Library"]'),
+        remove: document.querySelector('button[aria-label="Remove"]'),
+        pip: document.querySelector('button[data-testid="pip-toggle-button"]'),
+        lyrics: document.querySelector('button[aria-label="Lyrics"]'),
+        queue: document.querySelector('button[aria-label="Queue"]').parentElement,
+        devices: document.querySelector('svg[aria-label="Connect to a device"]').parentElement,
+        mute: document.querySelector('button[aria-label="Mute"]'),
     };
 }
 

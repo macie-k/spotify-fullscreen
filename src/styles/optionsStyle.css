@@ -60,21 +60,21 @@ hr {
     padding-top: 5px;
 }
 
-.contribute-container > svg {
+.contribute-container svg {
     cursor: pointer;
     height: 20px;
     width: auto;
 }
 
-.contribute-container > svg:hover {
+.contribute-container svg:hover {
     fill: #222;
 }
 
-#donate {
-    height: 18px;
+.donate {
+    height: 18px !important;
 }
 
-#issues:hover #mark {
+.issues:hover .mark {
     stroke: #fff;
 }
 
