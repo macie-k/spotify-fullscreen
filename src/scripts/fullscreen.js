@@ -4,33 +4,33 @@ var infoNode = null;
 var currentSong = {};
 var fullscreen = false;
 
-const waitForSongDetails = new Promise((resolve) => {
-    const waiter = setInterval(() => {
-        log('Waiting...');
+const waitForSongDetails = () =>
+    new Promise((resolve) => {
+        const waiter = setInterval(() => {
+            log('Waiting...');
 
-        let container = document.querySelector('div[data-testid="now-playing-widget"]');
-        if (container !== null) {
-            log('Widget ready');
-            infoNode = document.querySelector('a[data-testid="context-link"]');
+            let container = document.querySelector('div[data-testid="now-playing-widget"]');
+            if (container !== null) {
+                log('Widget ready');
+                infoNode = document.querySelector('a[data-testid="context-link"]');
 
-            clearInterval(waiter);
-            resolve(container);
-        }
-    }, 100);
-});
+                clearInterval(waiter);
+                resolve(container);
+            }
+        }, 100);
+    });
 
 window.addEventListener('load', async () => {
     await loadOptions();
 
-    waitForSongDetails.then(async (container) => {
-        updateCurrentSong(await getCurrentSongInfo());
+    const container = await waitForSongDetails();
+    updateCurrentSong(await getCurrentSongInfo());
 
-        addOverlay();
-        addButton(container);
+    addOverlay();
+    addButton(container);
 
-        addSongObserver();
-        addListeningOnObserver();
-    });
+    addSongObserver();
+    addListeningOnObserver();
 });
 
 async function loadOptions() {
@@ -67,7 +67,11 @@ async function getCurrentSongInfo() {
 
 async function getToken() {
     log('Requesting token');
-    return await fetch('https://kazmierczyk.me/_api/spotify-fs/token').then((res) => res.text());
+    const token = await fetch('https://kazmierczyk.me/_api/spotify-fs/token').then((res) =>
+        res.text()
+    );
+    log(token);
+    return token;
 }
 
 function toggleFullscreen() {
@@ -88,16 +92,16 @@ async function showFullscreen(show) {
         setFullscreenDetails();
         overlay.style.top = 0;
 
-        if (options.hide_bottom_art) {
+        if (options.other_options.hide_bottom_art) {
             setTimeout(() => {
-                document.querySelector('button[aria-label="Expand"]').click();
+                document.querySelector('button[aria-label="Expand"]')?.click();
             }, 200);
         }
     } else {
         log('Hiding fullscreen');
 
         document.querySelector('.fs-toggle').classList.remove('active');
-        document.querySelector('button[aria-label="Collapse"]').click();
+        document.querySelector('button[aria-label="Collapse"]')?.click();
 
         overlay.style.top = -overlay.clientHeight + 'px';
     }
@@ -119,7 +123,8 @@ function setFullscreenDetails() {
     const cover = document.querySelector('.fs-cover');
     cover.src = currentSong.cover;
     cover.classList.add(options.cover.type);
-    if (options.cover.spin) {
+
+    if (options.cover.spin && options.cover.type === 'round') {
         cover.classList.add('spin');
     }
 }
@@ -231,7 +236,7 @@ async function reFetch(url, retries) {
 }
 
 function log(val) {
-    if (options.enable_logging) {
+    if (options?.other_options?.enable_logging) {
         console.log('[Spotify FS]: ', val);
     }
 }

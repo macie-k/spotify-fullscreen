@@ -1,77 +1,102 @@
 var defaultOptions = {};
 var currentOptions = {};
 
+class Options {
+    #coverType;
+    #coverSpin;
+    #visibleIcons;
+    #otherOptions;
+
+    constructor(options) {
+        this.#coverType = options.cover.type;
+        this.#coverSpin = options.cover.spin;
+        this.#visibleIcons = options.show_icons;
+        this.#otherOptions = options.other_options;
+    }
+
+    static async load(defaultOptions) {
+        return new Promise((resolve) => {
+            chrome.storage.sync.get(defaultOptions, (options) => {
+                resolve(new Options(options));
+            });
+        });
+    }
+
+    attach() {
+        const spinRadio = document.querySelector('input[name="cover-options"][type="checkbox"]');
+        spinRadio.checked = this.#coverSpin;
+        spinRadio.disabled = this.#coverType !== 'round';
+        spinRadio.addEventListener('change', this.handleCoverSpin.bind(this));
+
+        /* cover options */
+        document.querySelectorAll('input[name="cover-options"][type="radio"]').forEach((input) => {
+            input.checked = input.value === this.#coverType;
+            input.addEventListener('change', this.handleCoverType.bind(this, spinRadio));
+        });
+
+        /* icon options */
+        document.querySelectorAll('input[name="icon-options"]').forEach((input) => {
+            input.checked = this.#visibleIcons.includes(input.value);
+
+            input.addEventListener('change', this.handleIcons.bind(this));
+        });
+
+        /* other options */
+        document.querySelectorAll('input[name="other-options"]').forEach((input) => {
+            input.checked = this.#otherOptions[input.value];
+
+            input.addEventListener('change', this.handleOther.bind(this));
+        });
+    }
+
+    handleCoverSpin({ target }) {
+        this.#coverSpin = !target.disabled && target.checked;
+        this.save();
+    }
+
+    handleCoverType(spinRadio, { target }) {
+        spinRadio.disabled = target.value !== 'round';
+        this.#coverType = target.value;
+
+        this.save();
+    }
+
+    handleIcons({ target }) {
+        if (target.checked) {
+            this.#visibleIcons.push(target.value);
+        } else {
+            this.#visibleIcons.splice(this.#visibleIcons.indexOf(target.value), 1);
+        }
+
+        this.save();
+    }
+
+    handleOther({ target }) {
+        this.#otherOptions[target.value] = target.checked;
+
+        this.save();
+    }
+
+    save() {
+        const options = {
+            cover: {
+                type: this.#coverType,
+                spin: this.#coverSpin,
+            },
+            show_icons: this.#visibleIcons,
+            other_options: this.#otherOptions,
+        };
+        chrome.storage.sync.set(options, () => {
+            console.log('Options saved: ', options);
+        });
+    }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     defaultOptions = await fetch(chrome.runtime.getURL('/resources/config/options.json')).then(
         (res) => res.json()
     );
 
-    loadSettings();
-    document.querySelectorAll('input').forEach((input) => {
-        input.addEventListener('change', handleOptionChange);
-    });
+    const options = await Options.load(defaultOptions);
+    options.attach();
 });
-
-function loadSettings() {
-    chrome.storage.sync.get(defaultOptions, (options) => {
-        currentOptions = options;
-
-        /* cover options */
-        document.querySelectorAll('input[name="cover-options"]').forEach((input) => {
-            input.checked = input.value === options.cover.type;
-            if (input.value === 'cover-spin') {
-                input.checked = options.cover.spin;
-                input.disabled = !document.querySelector('input[value="round"]').checked;
-            }
-        });
-
-        /* icon options */
-        document.querySelectorAll('input[name="icon-options"]').forEach((input) => {
-            input.checked = options.show_icons.includes(input.value);
-        });
-
-        /* other options */
-        document.querySelectorAll('input[name="other-options"]').forEach((input) => {
-            input.checked = options[input.value];
-        });
-    });
-}
-
-function handleOptionChange(e) {
-    const option = e.target;
-
-    const spinRadio = document.querySelector('input[value="cover-spin"]');
-    const newOptions = currentOptions;
-
-    switch (option.type) {
-        case 'radio':
-            spinRadio.disabled = option.value !== 'round';
-            newOptions.cover.type = option.value;
-            break;
-
-        case 'checkbox':
-            switch (option.name) {
-                case 'cover-options':
-                    newOptions.cover.spin = !spinRadio.disabled && spinRadio.checked;
-                    break;
-
-                case 'icon-options':
-                    if (option.checked) {
-                        newOptions.show_icons.push(option.value);
-                    } else {
-                        newOptions.show_icons = newOptions.show_icons.filter(
-                            (icon) => icon !== option.value
-                        );
-                    }
-                    break;
-
-                case 'other-options':
-                    newOptions[option.value] = option.checked;
-                    break;
-            }
-            break;
-    }
-    chrome.storage.sync.set(newOptions, () => {
-        console.log('Options saved: ', newOptions);
-    });
-}

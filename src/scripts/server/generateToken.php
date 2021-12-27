@@ -17,12 +17,12 @@
     } else {
         // if token found, read it and check the validity
         $saved_datetime = $file->datetime;
-        $interval = $saved_datetime - $current_datetime;
+        $interval = $current_datetime - $saved_datetime;
         
         if($interval < 3600) {
             echo $file->access_token;
         } else {
-            echo getNewTokenAndSave();
+            echo getNewTokenAndSave()->access_token;
         }
     }
 
