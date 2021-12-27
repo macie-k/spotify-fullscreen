@@ -1,6 +1,4 @@
 var options = {};
-var client_id = 'd882d791766e4a32969c10c265c57337';
-var client_secret = '39274d1fbb84487a9e821797e310b5b1';
 
 var infoNode = null;
 var currentSong = {};
@@ -69,20 +67,7 @@ async function getCurrentSongInfo() {
 
 async function getToken() {
     log('Requesting token');
-
-    const params = new URLSearchParams();
-    params.append('grant_type', 'client_credentials');
-
-    const res = await fetch('https://accounts.spotify.com/api/token', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            Authorization: 'Basic ' + btoa(`${client_id}:${client_secret}`),
-        },
-        body: params.toString(),
-    }).then((res) => res.json());
-
-    return res.access_token;
+    return await fetch('https://kazmierczyk.me/_api/spotify-fs/token').then((res) => res.text());
 }
 
 function toggleFullscreen() {
