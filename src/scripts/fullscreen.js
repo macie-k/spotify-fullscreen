@@ -12,7 +12,6 @@ const waitForSongDetails = () =>
             let container = document.querySelector('div[data-testid="now-playing-widget"]');
             if (container !== null) {
                 log('Widget ready');
-                infoNode = document.querySelector('a[data-testid="context-link"]');
 
                 clearInterval(waiter);
                 resolve(container);
@@ -44,6 +43,8 @@ async function loadOptions() {
 }
 
 async function getCurrentSongInfo() {
+    const infoNode = document.querySelector('a[data-testid="context-link"]');
+
     if (!localStorage.getItem('spotify_fs_token')) {
         updateLSToken(await getToken());
     }
@@ -108,6 +109,8 @@ async function showFullscreen(show) {
 }
 
 function updateCurrentSong(info) {
+    const infoNode = document.querySelector('a[data-testid="context-link"]');
+
     currentSong = {
         id: infoNode.href.split('track%3A')[1],
         title: info.title,
@@ -207,10 +210,15 @@ function addListeningOnObserver() {
 
 /* detect song changes */
 function addSongObserver() {
+    const infoNode = document.querySelector('a[data-testid="context-link"]');
     const observer = new MutationObserver(async () => {
-        log(`Song changed: ${currentSong.title}`);
+        const oldTitle = currentSong.title;
         updateCurrentSong(await getCurrentSongInfo());
-        setFullscreenDetails();
+
+        if (oldTitle !== currentSong.title) {
+            setFullscreenDetails();
+            log(`Song changed: ${currentSong.title}`);
+        }
     });
 
     observer.observe(infoNode, { attributes: true });
