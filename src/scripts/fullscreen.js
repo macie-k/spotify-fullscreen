@@ -5,7 +5,7 @@ var currentSong = {};
 var fullscreen = false;
 
 const waitForSongDetails = () =>
-    new Promise((resolve) => {
+    new Promise(resolve => {
         const waiter = setInterval(() => {
             log('Waiting...');
 
@@ -33,15 +33,15 @@ window.addEventListener('load', async () => {
 });
 
 async function loadOptions() {
-    log('Loading options')
+    log('Loading options');
     const defaultOptions = await fetch(
         chrome.runtime.getURL('/resources/config/options.json')
-    ).then((res) => res.json());
+    ).then(res => res.json());
 
-    chrome.storage.sync.get(defaultOptions, (savedOptions) => {
+    chrome.storage.sync.get(defaultOptions, savedOptions => {
         options = savedOptions;
     });
-    log('Options loaded')
+    log('Options loaded');
 }
 
 async function getCurrentSongInfo() {
@@ -53,16 +53,16 @@ async function getCurrentSongInfo() {
 
     const ID = infoNode.href.split('track%3A')[1];
     const songInfo = await reFetch(`https://api.spotify.com/v1/tracks/${ID}`, 1)
-        .then((res) => {
+        .then(res => {
             return res.json();
         })
-        .catch((err) => {
+        .catch(err => {
             log(err.message);
         });
 
     if (songInfo === undefined) return null;
     return {
-        artists: songInfo.artists.map((artist) => artist.name),
+        artists: songInfo.artists.map(artist => artist.name),
         cover: songInfo.album.images[0].url,
         title: songInfo.name,
     };
@@ -70,7 +70,7 @@ async function getCurrentSongInfo() {
 
 async function getToken() {
     log('Requesting token');
-    const token = await fetch('https://kazmierczyk.me/_api/spotify-fs/token').then((res) =>
+    const token = await fetch('https://kazmierczyk.me/_api/spotify-fs/token').then(res =>
         res.text()
     );
     log(token);
@@ -123,7 +123,7 @@ function updateCurrentSong(info) {
 
 function setFullscreenDetails() {
     const backgrounds = document.querySelectorAll('.fs-bg');
-    backgrounds.forEach((bg) => (bg.style.backgroundImage = `url('${currentSong.cover}')`));
+    backgrounds.forEach(bg => (bg.style.backgroundImage = `url('${currentSong.cover}')`));
 
     const cover = document.querySelector('.fs-cover');
     cover.src = currentSong.cover;
@@ -151,7 +151,10 @@ function hideBottomIcons(hide) {
             el.style.display = hide ? 'none' : 'block';
 
             if (icon === 'devices') {
-                document.querySelector('.encore-bright-accent-set')?.parentElement.style.display = hide ? 'none' : 'block';
+                const greenBar = document.querySelector('.encore-bright-accent-set');
+                if (greenBar) {
+                    greenBar.parentElement.style.display = hide ? 'none' : 'block';
+                }
             }
         }
     }
@@ -165,8 +168,8 @@ function updateLSToken(token) {
 /* inject overlay HTML */
 function addOverlay() {
     fetch(chrome.runtime.getURL('/src/html/fullscreen.html'))
-        .then((r) => r.text())
-        .then((html) => {
+        .then(r => r.text())
+        .then(html => {
             const overlay = document.createElement('div');
             overlay.innerHTML = html;
             overlay.className = 'fs-overlay-container';
@@ -180,8 +183,8 @@ function addOverlay() {
 /* inject toggle-button HTML */
 function addButton(container) {
     fetch(chrome.runtime.getURL('/src/html/button.html'))
-        .then((r) => r.text())
-        .then((html) => {
+        .then(r => r.text())
+        .then(html => {
             const button = document.createElement('div');
             button.innerHTML = html;
             button.addEventListener('click', toggleFullscreen);
@@ -228,7 +231,7 @@ async function reFetch(url, retries) {
         headers: {
             Authorization: `Bearer ${localStorage.getItem('spotify_fs_token')}`,
         },
-    }).then(async (res) => {
+    }).then(async res => {
         if (res.ok) return res;
         if (retries > 0) {
             if (res.status === 401) {
