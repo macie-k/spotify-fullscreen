@@ -33,6 +33,7 @@ window.addEventListener('load', async () => {
 });
 
 async function loadOptions() {
+    log('Loading options')
     const defaultOptions = await fetch(
         chrome.runtime.getURL('/resources/config/options.json')
     ).then((res) => res.json());
@@ -40,6 +41,7 @@ async function loadOptions() {
     chrome.storage.sync.get(defaultOptions, (savedOptions) => {
         options = savedOptions;
     });
+    log('Options loaded')
 }
 
 async function getCurrentSongInfo() {
@@ -149,11 +151,7 @@ function hideBottomIcons(hide) {
             el.style.display = hide ? 'none' : 'block';
 
             if (icon === 'devices') {
-                if (document.querySelector('.encore-bright-accent-set')) {
-                    document.querySelector(
-                        '.encore-bright-accent-set'
-                    ).parentElement.style.display = hide ? 'none' : 'block';
-                }
+                document.querySelector('.encore-bright-accent-set')?.parentElement.style.display = hide ? 'none' : 'block';
             }
         }
     }
