@@ -1,5 +1,5 @@
 # Spotify Webplayer Fullscreen
-Adds a clean fullscreen view for poor people without premium
+Adds a clean fullscreen view for poor people without the premium
 
 <br>
 
@@ -35,5 +35,5 @@ Adds a clean fullscreen view for poor people without premium
 
 # Sidenotes
 - If something is not working a refresh will likely help
-- Still not working? Enable logging, take a screenshots and open an issue [here](https://github.com/macie-k/spotify-fullscreen/issues)
+- Still not working? Enable logging, take a screenshot and open an issue [here](https://github.com/macie-k/spotify-fullscreen/issues)
 - I will add it to chrome store once I feel wealthy enough to pay the fee
